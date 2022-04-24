@@ -1,26 +1,45 @@
-resource "azurerm_resource_group" "example" {
-  name     = "example-resources"
-  location = "West Europe"
+# normal subnet with service endpoints
+# create subnet
+resource "azurerm_subnet" "this" {
+  name                  = var.name
+  resource_group_name   = var.rg_name
+  virtual_network_name  = var.vnet_name
+  address_prefixes      = var.address_prefixes
+
+  service_endpoints = var.service_endpoints
+
+  enforce_private_link_endpoint_network_policies = true
+  enforce_private_link_service_network_policies = false
 }
 
-resource "azurerm_network_security_group" "example" {
-  name                = "acceptanceTestSecurityGroup1"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+# output variables
+output "subnet_id" {
+  value = azurerm_subnet.this.id
+}
 
-  security_rule {
-    name                       = "test123"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+# delegated subnet, needed for integration with App Service
+# create subnet
+resource "azurerm_subnet" "this" {
+  name                  = var.name
+  resource_group_name   = var.rg_name
+  virtual_network_name  = var.vnet_name
+  address_prefixes      = var.address_prefixes
+
+  service_endpoints = var.service_endpoints
+  
+  delegation {
+    name = var.delegation_name
+    service_delegation {
+      name = var.service_delegation
+      actions = var.delegation_actions
+    }
   }
 
-  tags = {
-    environment = "dev"
-  }
+  enforce_private_link_endpoint_network_policies = false
+  enforce_private_link_service_network_policies = false
+}
+
+# output variables
+output "subnet_id" {
+  value = azurerm_subnet.this.id
 }
