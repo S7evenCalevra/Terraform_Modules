@@ -14,7 +14,7 @@ variable "location" {
   description = "Azure region"
 }
 
-variable "OS Type" {
+variable "OS_Type" {
   type = string
   description = "linux"
 }
