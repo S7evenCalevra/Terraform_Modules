@@ -1,6 +1,6 @@
 # normal subnet with service endpoints
 # create subnet
-resource "azurerm_subnet" "this" {
+resource "azurerm_subnet" "testsubnet1" {
   name                  = var.name
   resource_group_name   = var.rg_name
   virtual_network_name  = var.vnet_name
@@ -19,7 +19,7 @@ output "subnet_id" {
 
 # delegated subnet, needed for integration with App Service
 # create subnet
-resource "azurerm_subnet" "this" {
+resource "azurerm_subnet" "testsubnet1" {
   name                  = var.name
   resource_group_name   = var.rg_name
   virtual_network_name  = var.vnet_name

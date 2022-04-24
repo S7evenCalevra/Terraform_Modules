@@ -6,9 +6,7 @@ variable "EnvironmentName" {
     condition = anytrue([
       var.EnvironmentName == "prd",
       var.EnvironmentName == "stg",
-      var.EnvironmentName == "dev",
-      var.EnvironmentName == "test",
-      var.EnvironmentName == "uat"
+      var.EnvironmentName == "dev"
     ])
     error_message = "Must be a valid env, can be production, staging, development, or test."
   }
