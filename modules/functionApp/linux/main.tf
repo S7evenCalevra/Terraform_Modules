@@ -54,7 +54,7 @@ resource "azurerm_function_app" "function_app" {
     "WEBSITE_RUN_FROM_PACKAGE"       = "",
     "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.application_insights.instrumentation_key,
   }
-  os_type = "linux"
+  os_type = "${var.OS_Type}"
   storage_account_name       = azurerm_storage_account.storage_account.name
   storage_account_access_key = azurerm_storage_account.storage_account.primary_access_key
   version                    = "~3"
