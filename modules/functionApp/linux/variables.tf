@@ -13,3 +13,8 @@ variable "location" {
   type = string
   description = "Azure region"
 }
+
+variable "OS Type" {
+  type = string
+  description = "linux"
+}
