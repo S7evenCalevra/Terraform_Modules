@@ -1,6 +1,9 @@
 # terraform-azure-rg-module
 The repository explains about module and versioning mechanism.
 
+##Environement Structure
+![](terraform-multiple-environments-directories.webp)
+
 
 ## Module Basics
 - Module naming standard need to be followed
