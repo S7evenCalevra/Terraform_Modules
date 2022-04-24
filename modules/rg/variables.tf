@@ -1,12 +1,14 @@
-variable "azure_rg_name" {
-  description = "Azure Resource Group Name"
+variable "project" {
+  type = string
+  description = "Project name"
+}
+
+variable "environment" {
+  type = string
+  description = "Environment (dev / stage / prod)"
 }
 
 variable "location" {
-  description = "Default Location"
-}
-
-variable "tf-env" {
-  type    = string
-  default =  "poc"
+  type = string
+  description = "Azure region"
 }
