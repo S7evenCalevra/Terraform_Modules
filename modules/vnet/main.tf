@@ -1,45 +1,93 @@
-# normal subnet with service endpoints
-# create subnet
-resource "azurerm_subnet" "testsubnet1" {
-  name                  = var.name
-  resource_group_name   = var.rg_name
-  virtual_network_name  = var.vnet_name
-  address_prefixes      = var.address_prefixes
+###########################
+# CONFIGURATION
+###########################
 
-  service_endpoints = var.service_endpoints
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 2.0"
 
-  enforce_private_link_endpoint_network_policies = true
-  enforce_private_link_service_network_policies = false
-}
-
-# output variables
-output "subnet_id" {
-  value = azurerm_subnet.this.id
-}
-
-# delegated subnet, needed for integration with App Service
-# create subnet
-resource "azurerm_subnet" "testsubnet1" {
-  name                  = var.name
-  resource_group_name   = var.rg_name
-  virtual_network_name  = var.vnet_name
-  address_prefixes      = var.address_prefixes
-
-  service_endpoints = var.service_endpoints
-  
-  delegation {
-    name = var.delegation_name
-    service_delegation {
-      name = var.service_delegation
-      actions = var.delegation_actions
     }
   }
 
-  enforce_private_link_endpoint_network_policies = false
-  enforce_private_link_service_network_policies = false
+  backend "azurerm" {
+    
+  }
 }
 
-# output variables
-output "subnet_id" {
-  value = azurerm_subnet.this.id
+###########################
+# VARIABLES
+###########################
+
+variable "region" {
+  type        = string
+  description = "Region in Azure"
+  default     = "eastus"
+}
+
+variable "prefix" {
+  type        = string
+  description = "prefix for naming"
+  default     = "demo"
+}
+
+###########################
+# PROVIDERS
+###########################
+
+provider "azurerm" {
+  features {}
+}
+
+###########################
+# DATA SOURCES
+###########################
+
+locals {
+  name = "${var.prefix}-${random_id.seed.hex}"
+}
+
+###########################
+# RESOURCES
+###########################
+
+resource "random_id" "seed" {
+  byte_length = 4
+}
+
+resource "azurerm_resource_group" "vnet" {
+  name     = var.name
+  location = var.region
+}
+
+module "network" {
+  source              = "Azure/network/azurerm"
+  version             = "3.1.1"
+  resource_group_name = azurerm_resource_group.vnet.name
+  vnet_name           = local.name
+  address_space       = "10.0.0.0/16"
+  subnet_prefixes     = ["10.0.0.0/24","10.0.2.0/24","10.0.3.0/24"]
+  subnet_names        = ["subnet1", "subnet2", "subnet3"]
+
+  depends_on = [azurerm_resource_group.vnet]
+}
+
+#security_rule
+resource "azurerm_network_security_group" "allow_ssh" {
+  name = "allow_ssh"
+  location = var.region
+  resource_group_name = azurerm_resource_group.vnet.name
+
+  security_rule {
+    name = "allow_ssh"
+    priority = 100
+    direction = "Inbound"
+    access = "Allow" # Allow, Deny
+    protocol = "Tcp"
+    source_port_range = "*"
+    source_address_prefix = "*"
+    destination_port_range = "22"
+    destination_address_prefix = "*"
+  }
 }
