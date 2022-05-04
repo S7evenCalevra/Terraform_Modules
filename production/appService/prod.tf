@@ -3,5 +3,5 @@ module "app_service_prod" {
     app_service_plan_name = "plan-prod"
     app_service_name = "kenrick-app-service-prod"
     resource_group_name = "appservice-sample-prod-rg"
-    resource_group_location = "West Europe"
+    resource_group_location = "East US"
 }
