@@ -45,7 +45,8 @@ resource "azurerm_network_interface" "vm_nic" {
 }
 
 resource "azurerm_windows_virtual_machine" "vm_winvm" {
-  name                = "${var.vm_machine_name}"
+  count               = var.vm_count
+  name                = "${var.vm_machine_name}-${count.index}"
   resource_group_name = data.azurerm_resource_group.vm_rg.name
   location            = data.azurerm_resource_group.vm_rg.location
   size                = var.vm_size
