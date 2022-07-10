@@ -67,3 +67,8 @@ variable "keyvault_token" {
   type = string
   description = "keyvault_token"
 }
+
+variable "vm_count" {
+  default = 1
+  description = "number of virtual machines to create"
+}
