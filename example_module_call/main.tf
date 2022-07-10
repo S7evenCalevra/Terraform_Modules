@@ -11,7 +11,7 @@ module "windows_vm" {
     resource_group = "testdeploy-dev-resource-group"
     vm_network = "testdeploy-dev-network"
     vm_network_subnet = "internal"
-    vm_machine_name = "CMtestVM"
+    vm_machine_name = "WinTestVM"
     vm_size = "Standard_B2s"
     vm_network_interface_count = "2"
     vm_os_disk_size = 127
