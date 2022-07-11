@@ -25,7 +25,6 @@ resource "azurerm_network_interface" "vm_nic" {
 
   ip_configuration {
     name                          = "${var.vm_machine_name}-nic${count.index}"
-    subnet_id                     = data.azurerm_subnet.vm_sn.id
     private_ip_address_allocation = "Dynamic"
   }
 }
@@ -70,20 +69,3 @@ resource "azurerm_virtual_machine_data_disk_attachment" "vm_datadisk1_attach" {
   lun                = "10"
   caching            = "ReadWrite"
 }
-
-resource "azurerm_managed_disk" "vm_datadisk2" {
-  name                 = "${var.vm_machine_name}-disk2"
-  resource_group_name = data.azurerm_resource_group.vm_rg.name
-  location            = data.azurerm_resource_group.vm_rg.location
-  storage_account_type = "Standard_LRS"
-  create_option        = "Empty"
-  disk_size_gb         = var.vm_data_disk_size_2
-}
-
-resource "azurerm_virtual_machine_data_disk_attachment" "vm_datadisk2_attach" {
-  managed_disk_id    = azurerm_managed_disk.vm_datadisk2.id
-  virtual_machine_id = azurerm_windows_virtual_machine.vm_winvm.id
-  lun                = "11"
-  caching            = "ReadWrite"
-}
-
