@@ -1,3 +1,18 @@
+data "azurerm_resource_group" "keyvault_rg" {
+  name = "TerraformIACTest"
+}
+
+data "azurerm_key_vault" "keyvault" {
+  name = "terraffirniac-kv"
+  resource_group_name = "${data.azurerm_resource_group.keyvault_rg.name}"
+}
+
+data "azurerm_key_vault_secret" "VmToken" {
+  name = "testVMToken"
+  key_vault_id = "${data.azurerm_key_vault.keyvault.id}"
+}
+
+
 data "azurerm_resource_group" "vm_rg" {
   name = var.resource_group
 }
