@@ -53,20 +53,23 @@ variable "vm_data_disk_size_1" {
 #     description = "Size in GB for Data disk 3"
 # }
 
-# variable "keyvault_rg" {
-#   type = string
-#   description = "keyvault_rg"
-# }
+variable "keyvault_rg" {
+  type = string
+  default = "TerraformIACTest"
+  description = "keyvault_rg"
+}
 
-# variable "keyvault_name" {
-#   type = string
-#   description = "keyvault_name"
-# }
+variable "keyvault_name" {
+  type = string
+  default = "terraffirniac-kv"
+  description = "keyvault_name"
+}
 
-# variable "keyvault_token" {
-#   type = string
-#   description = "keyvault_token"
-# }
+variable "keyvault_token" {
+  type = string
+  default = "testVMToken"
+  description = "keyvault_token"
+}
 
 variable "vm_count" {
   default = 1
