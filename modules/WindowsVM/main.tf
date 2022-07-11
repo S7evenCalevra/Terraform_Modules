@@ -63,7 +63,7 @@ locals {
 }
 
 resource "azurerm_managed_disk" "vm_datadisk1" {
-  for_each            = azurerm_windows_virtual_machine.vm_winvm
+  count               = var.vm_count
   name                 = "${var.vm_machine_name}-${count.index}-disk1"
   resource_group_name = data.azurerm_resource_group.vm_rg.name
   location            = data.azurerm_resource_group.vm_rg.location
