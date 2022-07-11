@@ -63,13 +63,16 @@ locals {
 }
 
 resource "azurerm_managed_disk" "vm_datadisk1" {
-  count               = var.vm_count
+  for_each            = azurerm_windows_virtual_machine.vm_winvm
   name                 = "${var.vm_machine_name}-${count.index}-disk1"
   resource_group_name = data.azurerm_resource_group.vm_rg.name
   location            = data.azurerm_resource_group.vm_rg.location
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
   disk_size_gb         = var.vm_data_disk_size_1
+  depends_on           = [
+      azurerm_windows_virtual_machine.vm_winvm
+    ]
 }
 
 locals {
@@ -82,4 +85,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "vm_datadisk1_attach" {
   virtual_machine_id = element(local.vm_machines, count.index)
   lun                = "10"
   caching            = "ReadWrite"
+  depends_on         = [
+    azurerm_managed_disk.vm_datadisk1
+    ]
 }
