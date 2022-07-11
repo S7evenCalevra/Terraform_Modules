@@ -29,6 +29,10 @@ resource "azurerm_network_interface" "vm_nic" {
   }
 }
 
+locals {
+  vm_nics = chunklist(azurerm_network_interface.vm_nic[*].id, var.vm_network_interface_count)
+}
+
 resource "azurerm_windows_virtual_machine" "vm_winvm" {
   count               = var.vm_count
   name                = "${var.vm_machine_name}-${count.index}"
@@ -37,7 +41,7 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
   size                = var.vm_size
   admin_username      = "adminuser"
   admin_password      = "${data.azurerm_key_vault_secret.VmToken.value}"
-  network_interface_ids = azurerm_network_interface.vm_nic.*.id
+  network_interface_ids = element(local.vm_nics, count.index)
   
 
   os_disk {
@@ -54,8 +58,13 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
   }
 }
 
+locals {
+  vm_machines = chunklist(azurerm_windows_virtual_machine.vm_winvm[*].id, var.vm_count)
+}
+
 resource "azurerm_managed_disk" "vm_datadisk1" {
-  name                 = "${var.vm_machine_name}-disk1"
+  count               = var.vm_count
+  name                 = element(local.vm_machines.name, count.index) + "$-disk1"
   resource_group_name = data.azurerm_resource_group.vm_rg.name
   location            = data.azurerm_resource_group.vm_rg.location
   storage_account_type = "Standard_LRS"
@@ -63,9 +72,14 @@ resource "azurerm_managed_disk" "vm_datadisk1" {
   disk_size_gb         = var.vm_data_disk_size_1
 }
 
+locals {
+  vm_datadisks1 = chunklist(azurerm_managed_disk.vm_datadisk1[*].id, var.vm_count)
+}
+
 resource "azurerm_virtual_machine_data_disk_attachment" "vm_datadisk1_attach" {
-  managed_disk_id    = azurerm_managed_disk.vm_datadisk1.id
-  virtual_machine_id = azurerm_windows_virtual_machine.vm_winvm.id
+  count               = var.vm_count
+  managed_disk_id    = element(local.vm_datadisks1.name, count.index)
+  virtual_machine_id = element(local.vm_machines.name, count.index)
   lun                = "10"
   caching            = "ReadWrite"
 }
