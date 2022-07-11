@@ -8,15 +8,15 @@ variable "resource_group" {
     description = "Name of the resource group this server should be created in"
 }
 
-variable "vm_network" {
-    type = string
-    description = "Name of the virtual network the vm connects to"
-}
+# variable "vm_network" {
+#     type = string
+#     description = "Name of the virtual network the vm connects to"
+# }
 
-variable "vm_network_subnet" {
-    type = string
-    description = "Name of the subnet in the VM network"
-}
+# variable "vm_network_subnet" {
+#     type = string
+#     description = "Name of the subnet in the VM network"
+# }
 
 variable "vm_machine_name" {
     type = string
