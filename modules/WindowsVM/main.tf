@@ -1,14 +1,14 @@
 data "azurerm_resource_group" "keyvault_rg" {
-  name = "TerraformIACTest"
+  name = "${var.keyvault_rg}"
 }
 
 data "azurerm_key_vault" "keyvault" {
-  name = "terraffirniac-kv"
+  name = "${var.keyvault_name}"
   resource_group_name = "${data.azurerm_resource_group.keyvault_rg.name}"
 }
 
 data "azurerm_key_vault_secret" "VmToken" {
-  name = "testVMToken"
+  name = "${var.keyvault_token}"
   key_vault_id = "${data.azurerm_key_vault.keyvault.id}"
 }
 
