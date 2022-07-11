@@ -78,8 +78,8 @@ locals {
 
 resource "azurerm_virtual_machine_data_disk_attachment" "vm_datadisk1_attach" {
   count               = var.vm_count
-  managed_disk_id    = element(local.vm_datadisks1.name, count.index)
-  virtual_machine_id = element(local.vm_machines.name, count.index)
+  managed_disk_id    = element(local.vm_datadisks1, count.index)
+  virtual_machine_id = element(local.vm_machines, count.index)
   lun                = "10"
   caching            = "ReadWrite"
 }
