@@ -52,13 +52,14 @@ data "azurerm_subnet" "vm_sn" {
 }
 
 resource "azurerm_network_interface" "vm_nic" {
-  for_each               = toset([for j in local.nic_count_map : j.nic_name])
-  name                = each.key
+  #for_each               = toset([for j in local.nic_count_map : j.nic_name])
+  for_each               = toset(var.vm_names)
+  name                = "${each.key}-nic0"
   location            = data.azurerm_resource_group.vm_rg.location
   resource_group_name = data.azurerm_resource_group.vm_rg.name
 
   ip_configuration {
-    name                          = "${each.key}-config"
+    name                          = "${each.key}-nic0config"
     subnet_id                     = data.azurerm_subnet.vm_sn.id
     private_ip_address_allocation = "Dynamic"
   }
@@ -72,7 +73,7 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
   size                = var.vm_size
   admin_username      = "adminuser"
   admin_password      = "${data.azurerm_key_vault_secret.VmToken.value}"
-  network_interface_ids = azurerm_network_interface.vm_nic[each.key*].id
+  network_interface_ids = azurerm_network_interface.vm_nic[each.key].id
   
   os_disk {
     caching              = "ReadWrite"
