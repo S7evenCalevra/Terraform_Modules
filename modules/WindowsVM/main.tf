@@ -15,7 +15,7 @@ locals {
     for vm_name, count in local.vm_nic_count_map : [
       for i in range(count) : {
         nic_name = format("%s_nic_%02d", vm_name, i)
-        nic_num           = i
+        nic_num           = vm_name
       }
     ]
   ])
@@ -73,7 +73,7 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
   size                = var.vm_size
   admin_username      = "adminuser"
   admin_password      = "${data.azurerm_key_vault_secret.VmToken.value}"
-  network_interface_ids = [azurerm_network_interface.vm_nic[each.key].id]
+  network_interface_ids = [azurerm_network_interface.vm_nic[regexall(^each.key,*)].id]
   
   os_disk {
     caching              = "ReadWrite"
