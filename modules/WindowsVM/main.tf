@@ -9,6 +9,16 @@ locals {
       }
     ]
   ])
+  vm_nic_count_map = { for k in toset(var.vm_names) : k => var.nb_nics_per_vm }
+  nic_count        = { for k in local.nic_count_map : k.nic_name => k.nic_num }
+  nic_count_map = flatten([
+    for vm_name, count in local.vm_nic_count_map : [
+      for i in range(count) : {
+        nic_name = format("%s_nic_%02d", vm_name, i)
+        nic_num           = i
+      }
+    ]
+  ])
 }
 
 data "azurerm_resource_group" "keyvault_rg" {
@@ -42,13 +52,13 @@ data "azurerm_subnet" "vm_sn" {
 }
 
 resource "azurerm_network_interface" "vm_nic" {
-  for_each               = toset(var.vm_names)
-  name                = "${each.key}-nic0"
+  for_each               = toset([for j in local.nic_lun_map : j.nic_name])
+  name                = each.key
   location            = data.azurerm_resource_group.vm_rg.location
   resource_group_name = data.azurerm_resource_group.vm_rg.name
 
   ip_configuration {
-    name                          = "${each.key}-nic0config"
+    name                          = "${each.key}-config"
     subnet_id                     = data.azurerm_subnet.vm_sn.id
     private_ip_address_allocation = "Dynamic"
   }
@@ -62,7 +72,7 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
   size                = var.vm_size
   admin_username      = "adminuser"
   admin_password      = "${data.azurerm_key_vault_secret.VmToken.value}"
-  network_interface_ids = [azurerm_network_interface.vm_nic[each.key].id]
+  network_interface_ids = azurerm_network_interface.vm_nic[element(split("_", each.key), 0)].id
   
   os_disk {
     caching              = "ReadWrite"
@@ -81,7 +91,7 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
 }
 
 resource "azurerm_managed_disk" "managed_disk" {
-  for_each             = toset([for j in local.datadisk_lun_map : j.datadisk_name])
+  for_each             = toset([for j in local.nic_count_map : j.datadisk_name])
   name                 = each.key
   location             = data.azurerm_resource_group.vm_rg.location
   resource_group_name  = data.azurerm_resource_group.vm_rg.name
