@@ -52,7 +52,7 @@ data "azurerm_subnet" "vm_sn" {
 }
 
 resource "azurerm_network_interface" "vm_nic" {
-  for_each               = toset([for j in local.nic_lun_map : j.nic_name])
+  for_each               = toset([for j in local.nic_count_map : j.nic_name])
   name                = each.key
   location            = data.azurerm_resource_group.vm_rg.location
   resource_group_name = data.azurerm_resource_group.vm_rg.name
