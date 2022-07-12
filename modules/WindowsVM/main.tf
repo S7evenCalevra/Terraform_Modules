@@ -17,6 +17,17 @@ data "azurerm_resource_group" "vm_rg" {
   name = var.resource_group
 }
 
+data "azurerm_virtual_network" "vm_vn" {
+  name                = var.vm_network
+  resource_group_name = data.azurerm_resource_group.vm_rg.name
+}
+
+data "azurerm_subnet" "vm_sn" {
+  name                 = var.vm_network_subnet
+  resource_group_name  = data.azurerm_resource_group.vm_rg.name
+  virtual_network_name = data.azurerm_virtual_network.vm_vn.name
+}
+
 resource "azurerm_network_interface" "vm_nic" {
   count               = var.vm_network_interface_count
   name                = "${var.vm_machine_name}-nic${count.index}"
@@ -25,6 +36,7 @@ resource "azurerm_network_interface" "vm_nic" {
 
   ip_configuration {
     name                          = "${var.vm_machine_name}-nic${count.index}"
+    subnet_id                     = data.azurerm_subnet.vm_sn.id
     private_ip_address_allocation = "Dynamic"
   }
 }
