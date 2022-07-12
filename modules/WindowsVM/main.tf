@@ -77,7 +77,7 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
     sku       = "2019-Datacenter"
     version   = "latest"
   }
-  tags = var.tags
+  #tags = var.tags
 }
 
 resource "azurerm_managed_disk" "managed_disk" {
@@ -88,7 +88,7 @@ resource "azurerm_managed_disk" "managed_disk" {
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
   disk_size_gb         = 10
-  tags                 = var.tags
+  #tags                 = var.tags
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "managed_disk_attach" {
