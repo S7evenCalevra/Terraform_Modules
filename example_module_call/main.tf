@@ -9,12 +9,12 @@ module "windows_vm" {
     #source = "../../../modules/windows_vm"
     environment = "Dev"
     resource_group = "testdeploy-dev-resource-group"
-    vm_network = "testdeploy-dev-network"
-    vm_network_subnet = "internal"
     vm_machine_name = "WinTestVM"
+    vm_names = ["vm-test-1", "vm-test-3"]
     vm_size = "Standard_B2s"
-    vm_network_interface_count = "1"
+    nb_disks_per_vm = 2
+    nb_nics_per_vm = 2
     vm_os_disk_size = 127
     vm_data_disk_size_1 = 20
-    keyvault_rg = "TerraformIACTest"
+    vm_count = 2
 }
