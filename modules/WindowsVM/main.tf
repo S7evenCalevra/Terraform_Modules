@@ -42,7 +42,7 @@ data "azurerm_subnet" "vm_sn" {
 }
 
 resource "azurerm_network_interface" "vm_nic" {
-  count               = var.vm_count
+  count               = length(var.vm_names)
   name                = "${var.vm_machine_name}-${count.index}-nic0"
   location            = data.azurerm_resource_group.vm_rg.location
   resource_group_name = data.azurerm_resource_group.vm_rg.name
@@ -55,8 +55,8 @@ resource "azurerm_network_interface" "vm_nic" {
 }
 
 resource "azurerm_windows_virtual_machine" "vm_winvm" {
-  count               = length(var.instances)
-  name                = element(var.instances, count.index)
+  count               = length(var.vm_names)
+  name                = element(var.vm_names, count.index)
   resource_group_name = data.azurerm_resource_group.vm_rg.name
   location            = data.azurerm_resource_group.vm_rg.location
   size                = var.vm_size
