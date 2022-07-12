@@ -94,7 +94,7 @@ resource "azurerm_managed_disk" "managed_disk" {
 resource "azurerm_virtual_machine_data_disk_attachment" "managed_disk_attach" {
   for_each           = toset([for j in local.datadisk_lun_map : j.datadisk_name])
   managed_disk_id    = azurerm_managed_disk.managed_disk[each.key].id
-  virtual_machine_id = azurerm_linux_virtual_machine.vm[element(split("_", each.key), 1)].id
+  virtual_machine_id = azurerm_windows_virtual_machine.vm_winvm[element(split("_", each.key), 1)].id
   lun                = lookup(local.luns, each.key)
   caching            = "ReadWrite"
 }
