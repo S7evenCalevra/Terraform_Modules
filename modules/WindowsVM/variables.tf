@@ -30,6 +30,10 @@ variable "vm_names" {
     
 }
 
+variable "nb_disks_per_vm" {
+    type = number
+}
+
 variable "vm_size" {
     type = string
     description = "Size tempalate for the VM to use.  For example: Standard_F2"
