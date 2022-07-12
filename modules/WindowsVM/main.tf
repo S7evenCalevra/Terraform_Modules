@@ -42,7 +42,7 @@ resource "azurerm_network_interface" "vm_nic" {
 }
 
 locals {
-  vm_nics = chunklist(azurerm_network_interface.vm_nic[*].id
+  vm_nics = azurerm_network_interface.vm_nic[*].id
 }
 
 resource "azurerm_windows_virtual_machine" "vm_winvm" {
