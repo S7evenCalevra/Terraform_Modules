@@ -25,6 +25,11 @@ variable "vm_machine_name" {
     description = "Name of the Server"
 }
 
+variable "vm_names" {
+    type = list
+    
+}
+
 variable "vm_size" {
     type = string
     description = "Size tempalate for the VM to use.  For example: Standard_F2"
