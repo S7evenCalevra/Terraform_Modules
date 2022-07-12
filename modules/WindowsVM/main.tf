@@ -68,7 +68,7 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
     disk_size_gb         = var.vm_os_disk_size
-    name                 = "osdisk-${element(var.instances, count.index)}-${count.index}"
+    name                 = "osdisk-${element(var.vm_names, count.index)}-${count.index}"
   }
   
   source_image_reference {
@@ -83,8 +83,8 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
 resource "azurerm_managed_disk" "managed_disk" {
   for_each             = toset([for j in local.datadisk_lun_map : j.datadisk_name])
   name                 = each.key
-  location             = azurerm_resource_group.rg.location
-  resource_group_name  = azurerm_resource_group.rg.name
+  location             = azurerm_resource_group.vm_rg.location
+  resource_group_name  = azurerm_resource_group.vm_rg.name
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
   disk_size_gb         = 10
