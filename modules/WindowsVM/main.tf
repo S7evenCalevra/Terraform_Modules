@@ -91,7 +91,7 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
 }
 
 resource "azurerm_managed_disk" "managed_disk" {
-  for_each             = toset([for j in local.nic_count_map : j.datadisk_name])
+  for_each             = toset([for j in local.datadisk_lun_map : j.datadisk_name])
   name                 = each.key
   location             = data.azurerm_resource_group.vm_rg.location
   resource_group_name  = data.azurerm_resource_group.vm_rg.name
