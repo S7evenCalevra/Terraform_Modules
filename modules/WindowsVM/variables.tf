@@ -34,15 +34,20 @@ variable "nb_disks_per_vm" {
     type = number
 }
 
+variable "nb_nics_per_vm" {
+    type = number
+}
+
+
 variable "vm_size" {
     type = string
     description = "Size tempalate for the VM to use.  For example: Standard_F2"
 }
 
-variable "vm_network_interface_count" {
-    type = number
-    description = "Number of network interfaces for the VM"
-}
+# variable "vm_network_interface_count" {
+#     type = number
+#     description = "Number of network interfaces for the VM"
+# }
 
 variable "vm_os_disk_size" {
     type = string
