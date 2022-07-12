@@ -29,20 +29,20 @@ data "azurerm_subnet" "vm_sn" {
 }
 
 resource "azurerm_network_interface" "vm_nic" {
-  count               = var.vm_network_interface_count
-  name                = "${var.vm_machine_name}-nic${count.index}"
+  count               = var.vm_count
+  name                = "${var.vm_machine_name}-${count.index}-nic0"
   location            = data.azurerm_resource_group.vm_rg.location
   resource_group_name = data.azurerm_resource_group.vm_rg.name
 
   ip_configuration {
-    name                          = "${var.vm_machine_name}-nic${count.index}"
+    name                          = "${var.vm_machine_name}-${count.index}-nic0config"
     subnet_id                     = data.azurerm_subnet.vm_sn.id
     private_ip_address_allocation = "Dynamic"
   }
 }
 
 locals {
-  vm_nics = chunklist(azurerm_network_interface.vm_nic[*].id, var.vm_network_interface_count)
+  vm_nics = chunklist(azurerm_network_interface.vm_nic[*].id
 }
 
 resource "azurerm_windows_virtual_machine" "vm_winvm" {
