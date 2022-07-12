@@ -59,7 +59,7 @@ resource "azurerm_windows_virtual_machine" "vm_winvm" {
 }
 
 locals {
-  vm_machines = chunklist(azurerm_windows_virtual_machine.vm_winvm[*].id, 1)
+  vm_machines = azurerm_windows_virtual_machine.vm_winvm[*].id
 }
 
 resource "azurerm_managed_disk" "vm_datadisk1" {
@@ -76,7 +76,7 @@ resource "azurerm_managed_disk" "vm_datadisk1" {
 }
 
 locals {
-  vm_datadisks1 = chunklist(azurerm_managed_disk.vm_datadisk1[*].id, 1)
+  vm_datadisks1 = azurerm_managed_disk.vm_datadisk1[*].id
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "vm_datadisk1_attach" {
