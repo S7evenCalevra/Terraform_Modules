@@ -99,7 +99,7 @@ resource "azurerm_managed_disk" "managed_disk" {
   resource_group_name  = data.azurerm_resource_group.vm_rg.name
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
-  disk_size_gb         = 10
+  disk_size_gb         = vm_data_disk_size_1
   #tags                 = var.tags
 }
 
