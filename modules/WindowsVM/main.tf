@@ -1,3 +1,26 @@
+locals {
+  vm_datadiskdisk_count_map = { for k in toset(var.vm_names) : k => var.nb_disks_per_vm }
+  luns                      = { for k in local.datadisk_lun_map : k.datadisk_name => k.lun }
+  datadisk_lun_map = flatten([
+    for vm_name, count in local.vm_datadiskdisk_count_map : [
+      for i in range(count) : {
+        datadisk_name = format("datadisk_%s_disk%02d", vm_name, i)
+        lun           = i
+      }
+    ]
+  ])
+  vm_nic_count_map = { for k in toset(var.vm_names) : k => var.nb_nics_per_vm }
+  nic_count        = { for k in local.nic_count_map : k.nic_name => k.nic_num }
+  nic_count_map = flatten([
+    for vm_name, count in local.vm_nic_count_map : [
+      for i in range(count) : {
+        nic_name = format("%s_nic_%02d", vm_name, i)
+        nic_num           = vm_name
+      }
+    ]
+  ])
+}
+
 data "azurerm_resource_group" "keyvault_rg" {
   name = "${var.keyvault_rg}"
 }
@@ -13,11 +36,9 @@ data "azurerm_key_vault_secret" "VmToken" {
 }
 
 
-
 data "azurerm_resource_group" "vm_rg" {
   name = var.resource_group
 }
-
 
 data "azurerm_virtual_network" "vm_vn" {
   name                = var.vm_network
@@ -30,89 +51,62 @@ data "azurerm_subnet" "vm_sn" {
   virtual_network_name = data.azurerm_virtual_network.vm_vn.name
 }
 
-
 resource "azurerm_network_interface" "vm_nic" {
-  count               = var.vm_network_interface_count
-  name                = "${var.vm_machine_name}-nic${count.index}"
+  #for_each               = toset([for j in local.nic_count_map : j.nic_name])
+  for_each               = toset(var.vm_names)
+  name                = "${each.key}-nic0"
   location            = data.azurerm_resource_group.vm_rg.location
   resource_group_name = data.azurerm_resource_group.vm_rg.name
 
   ip_configuration {
-    name                          = "${var.vm_machine_name}-nic${count.index}"
+    name                          = "${each.key}-nic0config"
     subnet_id                     = data.azurerm_subnet.vm_sn.id
     private_ip_address_allocation = "Dynamic"
   }
 }
 
 resource "azurerm_windows_virtual_machine" "vm_winvm" {
-  count               = var.vm_count
-  name                = "${var.vm_machine_name}-${count.index}"
+  for_each               = toset(var.vm_names)
+  name                = each.key
   resource_group_name = data.azurerm_resource_group.vm_rg.name
   location            = data.azurerm_resource_group.vm_rg.location
   size                = var.vm_size
   admin_username      = "adminuser"
   admin_password      = "${data.azurerm_key_vault_secret.VmToken.value}"
-  network_interface_ids = azurerm_network_interface.vm_nic.*.id
+  network_interface_ids = [azurerm_network_interface.vm_nic[each.key].id]
   
-
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
     disk_size_gb         = var.vm_os_disk_size
+    name                 = "${each.key}-osdisk"
   }
-
+  
   source_image_reference {
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
     sku       = "2019-Datacenter"
     version   = "latest"
   }
+  
+  #tags = var.tags
 }
 
-resource "azurerm_managed_disk" "vm_datadisk1" {
-  name                 = "${var.vm_machine_name}-disk1"
-  resource_group_name = data.azurerm_resource_group.vm_rg.name
-  location            = data.azurerm_resource_group.vm_rg.location
+resource "azurerm_managed_disk" "managed_disk" {
+  for_each             = toset([for j in local.datadisk_lun_map : j.datadisk_name])
+  name                 = each.key
+  location             = data.azurerm_resource_group.vm_rg.location
+  resource_group_name  = data.azurerm_resource_group.vm_rg.name
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
-  disk_size_gb         = var.vm_data_disk_size_1
+  disk_size_gb         = 10
+  #tags                 = var.tags
 }
 
-resource "azurerm_virtual_machine_data_disk_attachment" "vm_datadisk1_attach" {
-  managed_disk_id    = azurerm_managed_disk.vm_datadisk1.id
-  virtual_machine_id = azurerm_windows_virtual_machine.vm_winvm.id
-  lun                = "10"
-  caching            = "ReadWrite"
-}
-
-resource "azurerm_managed_disk" "vm_datadisk2" {
-  name                 = "${var.vm_machine_name}-disk2"
-  resource_group_name = data.azurerm_resource_group.vm_rg.name
-  location            = data.azurerm_resource_group.vm_rg.location
-  storage_account_type = "Standard_LRS"
-  create_option        = "Empty"
-  disk_size_gb         = var.vm_data_disk_size_2
-}
-
-resource "azurerm_virtual_machine_data_disk_attachment" "vm_datadisk2_attach" {
-  managed_disk_id    = azurerm_managed_disk.vm_datadisk2.id
-  virtual_machine_id = azurerm_windows_virtual_machine.vm_winvm.id
-  lun                = "11"
-  caching            = "ReadWrite"
-}
-
-resource "azurerm_managed_disk" "vm_datadisk3" {
-  name                 = "${var.vm_machine_name}-disk3"
-  resource_group_name = data.azurerm_resource_group.vm_rg.name
-  location            = data.azurerm_resource_group.vm_rg.location
-  storage_account_type = "Standard_LRS"
-  create_option        = "Empty"
-  disk_size_gb         = var.vm_data_disk_size_3
-}
-
-resource "azurerm_virtual_machine_data_disk_attachment" "vm_datadisk3_attach" {
-  managed_disk_id    = azurerm_managed_disk.vm_datadisk3.id
-  virtual_machine_id = azurerm_windows_virtual_machine.vm_winvm.id
-  lun                = "12"
+resource "azurerm_virtual_machine_data_disk_attachment" "managed_disk_attach" {
+  for_each           = toset([for j in local.datadisk_lun_map : j.datadisk_name])
+  managed_disk_id    = azurerm_managed_disk.managed_disk[each.key].id
+  virtual_machine_id = azurerm_windows_virtual_machine.vm_winvm[element(split("_", each.key), 1)].id
+  lun                = lookup(local.luns, each.key)
   caching            = "ReadWrite"
 }
