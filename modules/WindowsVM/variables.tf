@@ -20,11 +20,6 @@ variable "vm_network_subnet" {
     description = "Name of the subnet in the VM network"
 }
 
-variable "vm_machine_name" {
-    type = string
-    description = "Name of the Server"
-}
-
 variable "vm_names" {
     type = list
     
