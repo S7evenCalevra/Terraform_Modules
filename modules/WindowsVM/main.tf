@@ -4,7 +4,7 @@ locals {
   datadisk_lun_map = flatten([
     for vm_name, count in local.vm_datadiskdisk_count_map : [
       for i in range(count) : {
-        datadisk_name = format("datadisk_%s_disk%02d", vm_name, i)
+        datadisk_name = format("%s_datadisk%02d", vm_name, i)
         lun           = i
       }
     ]
