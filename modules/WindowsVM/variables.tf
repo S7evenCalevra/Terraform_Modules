@@ -10,13 +10,13 @@ variable "resource_group" {
 
 variable "vm_network" {
     type = string
-    default = "testdeploy-dev-network"
+    default = "vnet-cm-nice_servers-dev-use2"
     description = "Name of the virtual network the vm connects to"
 }
 
 variable "vm_network_subnet" {
     type = string
-    default = "internal"
+    default = "default"
     description = "Name of the subnet in the VM network"
 }
 
